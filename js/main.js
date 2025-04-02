@@ -1,1135 +1,830 @@
 /** Responsive Navbar **/
 
 function myFunction() {
-	var x = document.getElementById("myTopnav");
-	if (x.className === "topnav") {
-		x.className += " responsive";
-	} else {
-		x.className = "topnav";
-	}
+  var x = document.getElementById("myTopnav");
+  if (x.className === "topnav") {
+    x.className += " responsive";
+  } else {
+    x.className = "topnav";
+  }
 }
 
 /** Smooth Scrolling**/
 $(document).on("click", 'a[href^="#"]', function (event) {
-	event.preventDefault();
-	$("html, body").animate(
-		{
-			scrollTop: $($.attr(this, "href")).offset().top,
-		},
-		500
-	);
+  event.preventDefault();
+  $("html, body").animate(
+    {
+      scrollTop: $($.attr(this, "href")).offset().top,
+    },
+    500
+  );
 });
 
-/** Main Diagnostic Quiz Function **/
-
 (function () {
-	var questions = [
+  var NumberOfQuestion = 60; // total number of question for the whole exam
+  var totalTime = 30 * 60; // total time for the whole exam (converting to seconds)
+  var currentTime = parseInt(sessionStorage.getItem("examTime")) || totalTime; // current time
+  var timerDisplay = $("#timer");
+  var examEnded = false; // Variable to track if the exam has ended
 
-		{
-			//
-			//1
-			//
-			//passageI starts
-			//b1
-			qType: "Section A: Comprehension & Summary (Passage I)",
-			question: "1. What does the author mean when he says that many people are 'form-blind'?",
-			choices: ["A) They have difficulty distinguishing between different colours.",
-				        "B) They are unable to appreciate or understand shapes in three dimensions.",
-				        "C) They are unable to see objects clearly at a distance.",
-				        "D) They prefer two-dimensional art over three-dimensional art."],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionA_PassageI.png",
-		},
-		{
-			//
-			//2
-			//c2
-			//
-			//
-			qType: "Section A: Comprehension & Summary (Passage I)",
-			question: "How does the passage describe the way most people develop their ability to perceive form?",
-			choices: ["A) They fully develop their ability to perceive three-dimensional forms.",
-					      "B) They use their sense of touch to entirely understand form.",
-					      "C) They only develop their perception of form as much as is necessary for practical and safety purposes.",
-					      "D) They naturally become as skilled as sculptors in perceiving form."],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionA_PassageI.png",
-		},
-		{
-			//
-			//3
-			//c2
-			//
-			//
-			qType: "Section A: Comprehension & Summary (Passage I)",
-			question: "What must a sensitive observer of sculpture learn to do, according to the passage?",
-			choices: ["A) Perceive forms primarily for their practical uses.",
-				        "B) Understand the historical context of the sculptures they observe.",
-				        "C) Appreciate shapes as pure forms, separate from their usual meanings or associations.",
-				        "D) Visualise the forms in two dimensions before imagining them in three dimensions."],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionA_PassageI.png",
-		},
-		{
-			//
-			//4
-			//A0
-			//
-			//
-			qType: "Section A: Comprehension & Summary (Passage I)",
-			question: "4. The word 'reminiscence' used in the last paragraph means _____.",
-			choices: ["A) Memory or recollection",
-			          "B) Reflection or thought",
-			          "C) Anticipation of the future",
-			          "D) A detailed description"],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionA_PassageI.png",
-		},
-		{
-			//
-			//5
-			//b1
-			//
-			//
-			qType: "Section A: Comprehension & Summary (Passage I)",
-			question: "5. Which of the following statements is false according to the passage?",
-			choices: ["A) Sculpture is more difficult to appreciate than flat forms because it involves three-dimensional perception.",
-			          "B) The ability to perceive form in three dimensions is something most people fully develop.",
-			          "C) The sculptor must be able to visualise a shape in its complete three-dimensional form.",
-			          "D) The sensitive observer of sculpture must perceive shapes independently of their practical or literary significance."],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionA_PassageI.png",
-		},
-		{
-			//
-			//6
-			//b1
-			//
-			//
-			qType: "Section A: Comprehension & Summary (Passage II)",
-			question: "6. According to the passage, how do cities today differ from those of the past?",
-			choices: ["A) Cities today have more concentrated manufacturing and business activities in their centres than before.",
-					      "B) The need for cities to be close to manufacturing and business centres has diminished due to advances in technology.",
-					      "C) Cities now require people to live in the centre to access essential services.",
-					      "D) The growth of cities is driven more by the need for defence than by technological advancements."],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionA_PassageII.png",
-		},
-		{
-			//
-			//7
-			//
-			//
-			//a0
-			qType: "Section A: Comprehension & Summary (Passage II)",
-			question: "7. What does the word ‘ominous’ mean in the context of the text?",
-			choices: ["A) threatening",
-				        "B) promising",
-				        "C) uncertain",
-				        "D) positive"],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionA_PassageII.png",
-		},
-		{
-			//
-			//8
-			//c2
-			//
-			//
-			qType: "Section A: Comprehension & Summary (Passage II)",
-			question: "8. Which of the following is NOT the reason why the choice of sites for cities are altering?",
-			choices: ["A) Mechanical power can be transmitted over long distances.",
-			          "B) Communication can occur almost instantaneously through modern technology.",
-			          "C) The need for closer proximity to manufacturing and business centres is increasing.",
-			          "D) Transportation by airplanes has become more efficient."],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionA_PassageII.png",
-		},
-		{
-			//
-			//9
-			//a0
-			//
-			//
-			qType: "Section A: Comprehension & Summary (Passage II)",
-			question: "9. The word ‘apart from’ in the passage can be replaced by _____.",
-			choices: ["A) except for",
-				        "B) in addition to",
-				        "C) together with",
-				        "D) during"],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionA_PassageII.png",
-		},
-		{
-			//
-			//10
-			//b1
-			//
-			//
-			qType: "Section A: Comprehension & Summary (Passage II)",
-			question: "10. According to the passage, what is a significant change in the reasons for city growth due to technological advancements?",
-			choices: ["A) Cities are now more concentrated around manufacturing activities.",
-			          "B) Communication and transportation technologies have reduced the need for proximity to city centres.",
-			          "C) Cities have become more dependent on manual power for growth.",
-			          "D) The demand for public services within cities has increased."],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionA_PassageII.png",
-		},
-		{
-			//
-			//
-			//11
-			//b1
-			//passage3 start
-			qType: "Section A: Comprehension & Summary (Passage III)",
-			question: "11. What does this passage mainly discuss?",
-			choices: ["A) Alfred Bernhard Nobel",
-				        "B) The Nobel prizes",
-				        "C) Great contributions to mankind",
-				        "D) Swedish philanthropy"],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionA_PassageIII.png",
-		},
-		{
-			//
-			//a0
-			//12
-			//
-			//
-			qType: "Section A: Comprehension & Summary (Passage III)",
-			question: "12. Why were the prizes named for Alfred Bernhard Nobel?",
-			choices: ["A) He left money in his will to establish a fund for the prizes.",
-					      "B) He won the first Nobel prize for his work in philanthropy.",
-					      "C) He is now living in Sweden.",
-					      "D) He serves as chairman of the committee to choose the recipients of the prizes."],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionA_PassageIII.png",
-		},
-		{
-			//
-			//
-			//13
-			//b1
-			//
-			qType: "Section A: Comprehension & Summary (Passage III)",
-			question: "13. How often are the Nobel prizes awarded?",
-			choices: ["A) Five times a year",
-								"B) Once a year",
-			          "C) Twice a year",
-			          "D) Once every two years"],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionA_PassageIII.png",
-		},
-		{
-			//
-			//
-			//14
-			//d3
-			//
-			qType: "Section A: Comprehension & Summary (Passage III)",
-			question: "14. The word ‘outstanding’ in line 4 could best be replaced by _____.",
-			choices: ["A) recent",
-				        "B) unusual",
-			 	        "C) established",
-				        "D) exceptional"],
-			correctAnswer: 3,
-			image: "img/JAMB4_Comprehension_SectionA_PassageIII.png",
-		},
-		{
-			//
-			//
-			//15
-			//b1
-			//
-			qType: "Section A: Comprehension & Summary (Passage III)",
-			question: "15. The word ‘will’ in line 5 refers to _____.",
-			choices: ["A) Nobel’s wishes",
-					      "B) a legal document",
-					      "C) a future intention",
-					      "D) a free choice"],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionA_PassageIII.png",
-		},
-		{
-			//
-			//
-			//16
-			//c2
-			//
-			qType: "Section A: Comprehension & Summary (Passage III)",
-			question: "16. A Nobel prize would NOT be given to _____.",
-			choices: ["A) an author who wrote a novel",
-			          "B) a doctor who discovered a vaccine",
-			          "C) a composer who wrote a symphony",
-			          "D) a diplomat who negotiated a peace settlement"],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionA_PassageIII.png",
-		},
-		{
-			//c2
-			//
-			//17
-			//
-			//
-			qType: "Section A: Comprehension & Summary (Passage III)",
-			question: "17. The word ‘one’ in line 15 refers to _____.",
-			choices: ["A) tribute",
-					      "B) anniversary",
-					      "C) prize",
-					      "D) candidate"],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionA_PassageIII.png",
-		},
-		{
-			//
-			//
-			//18
-			//b1
-			//
-			qType: "Section A: Comprehension & Summary (Passage III)",
-			question: "18. Which individual or organisation serves as administrator for the trust?",
-			choices: ["A) The King of Sweden",
-				        "B) The Nobel Foundation",
-				        "C) The Central Bank of Sweden",
-				        "D) Swedish and Norwegian academies and institutes"],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionA_PassageIII.png",
-		},
-		{
-			//
-			//
-			//19
-			//c2
-			//
-			qType: "Section A: Comprehension & Summary (Passage III)",
-			question: "19. The word ‘appropriate’ in line 15 is closest in meaning to _____.",
-			choices: ["A) prestigious",
-					      "B) customary",
-					      "C) suitable",
-					      "D) transitory"],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionA_PassageIII.png",
-		},
-		{
-			//
-			//
-			//20
-			//
-			//b1
-			qType: "Section A: Comprehension & Summary (Passage III)",
-			question: "20. Why are the awards presented on December 10th?",
-			choices: ["A) It is a tribute to the King of Sweden.",
-					      "B) Alfred Bernhard Nobel died on that day.",
-					      "C) That date was established in Alfred Nobel’s will.",
-					      "D) The Central Bank of Sweden administers the trust."],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionA_PassageIII.png",
-		},
-		{
-			//
-			//
-			//21
-			//
-			//b1
-			qType: "Section B: Lexis & Structure",
-			question: "21. Choose the most appropriate option for 21.",
-			choices: ["A) trusting",
-				        "B) trusted",
-				        "C) being trusted",
-				        "D) been trusting"],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionB_21-30.png",
-		},
-		{
-			//
-			//
-			//22
-			//
-			//d3
-			qType: "Section B: Lexis & Structure",
-			question: "22. Choose the most appropriate option for 22.",
-			choices: ["A) sent",
-			          "B) made",
-			          "C) received",
-			          "D) threw"],
-			correctAnswer: 3,
-			image: "img/JAMB4_Comprehension_SectionB_21-30.png",
-		},
-		{
-			//
-			//
-			//23
-			//
-			//a0
-			qType: "Section B: Lexis & Structure",
-			question: "23. Choose the most appropriate option for 23.",
-			choices: ["A) inherited",
-				        "B) assessed",
-				        "C) passed down",
-				        "D) conquered"],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionB_21-30.png",
-		},
-		{
-			//
-			//
-			//24
-			//b1
-			//
-			qType: "Section B: Lexis & Structure",
-			question: "24. Choose the most appropriate option for 24.",
-			choices: ["A) suspicion",
-					      "B) suspicious",
-					      "C) suspiciously",
-					      "D) suspect"],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionB_21-30.png",
-		},
-		{
-			//
-			//
-			//25
-			//d3
-			//
-			qType: "Section B: Lexis & Structure",
-			question: "25. Choose the most appropriate option for 25.",
-			choices: ["A) told not",
-				        "B) not telling",
-				        "C) been told",
-				        "D) not been telling"],
-			correctAnswer: 3,
-			image: "img/JAMB4_Comprehension_SectionB_21-30.png",
-		},
-		{
-			//
-			//
-			//26
-			//c2
-			//
-			qType: "Section B: Lexis & Structure",
-			question: "26. Choose the most appropriate option for 26.",
-			choices: ["A) call",
-					      "B) trusted",
-					      "C) being trusted",
-					      "D) been trusting"],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionB_21-30.png",
-		},
-		{
-			//
-			//
-			//27
-			//a0
-			//
-			qType: "Section B: Lexis & Structure",
-			question: "27. Choose the most appropriate option for 27.",
-			choices: ["A) copies",
-					      "B) made",
-					      "C) received",
-					      "D) threw"],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionB_21-30.png",
-		},
-		{
-			//
-			//
-			//28
-			//d3
-			//
-			qType: "Section B: Lexis & Structure",
-			question: "28. Choose the most appropriate option for 28.",
-			choices: ["A) recorder",
-				        "B) assessed",
-				        "C) passed down",
-				        "D) conquered"],
-			correctAnswer: 3,
-			image: "img/JAMB4_Comprehension_SectionB_21-30.png",
-		},
-		{
-			//
-			//
-			//29
-			//b1
-			//
-			qType: "Section B: Lexis & Structure",
-			question: "29. Choose the most appropriate option for 29.",
-			choices: ["A) on",
-					      "B) inside",
-					      "C) at",
-					      "D) across"],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionB_21-30.png",
-		},
-		{
-			//
-			//
-			//30
-			//c2
-			//
-			qType: "Section B: Lexis & Structure",
-			question: "30. Choose the most appropriate option for 30.",
-			choices: ["A) arrest",
-								"B) arresting",
-								"C) arrested",
-						    "D) arrestedly"],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionB_21-30.png",
-		},
-		{
-			//
-			//
-			//31
-			//c2
-			//
-			qType: "Section B: Lexis & Structure",
-			question: "31. The newly appointed manager <u>has his heart set on</u> improving the company's business.",
-			choices: ["A) is interested in",
-					      "B) is indifferent to",
-					      "C) is determined to",
-					      "D) is doubtful about"],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionB_31-40.png",
-		},
-		{
-			//
-			//
-			//32
-			//b1
-			//
-			qType: "Section B: Lexis & Structure",
-			question: "32. People <u>from all walks of life</u> have to continue their education even when they are old.",
-			choices: ["A) from different countries",
-					      "B) from different professions and backgrounds",
-					      "C) from wealthy families",
-					      "D) from the same social class"],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionB_31-40.png",
-		},
-		{
-			//
-			//
-			//33
-			//A0
-			//
-			qType: "Section B: Lexis & Structure",
-			question: "33. The offensive servant <u>craves</u> for her master’s pardon.",
-			choices: ["A) desires",
-			          "B) demands",
-			          "C) waits for",
-			          "D) accepts"],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionB_31-40.png",
-		},
-		{
-			//a0
-			//
-			//34
-			//
-			//
-			qType: "Section B: Lexis & Structure",
-			question: "34. No matter how strict a country’s law is, we must still <u>strike a balance</u> between justice and mercy.",
-			choices: ["A) maintain fairness",
-					      "B) compromise",
-					      "C) choose one",
-					      "D) be lenient"],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionB_31-40.png",
-		},
-		{
-			//
-			//
-			//35
-			//
-			//b1
-			qType: "Section B: Lexis & Structure",
-			question: "35. Please <u>rest assured</u> that the scholarship department will arrange everything for you.",
-			choices: ["A) be hopeful",
-				        "B) be confident",
-				        "C) be cautious",
-				        "D) be concerned"],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionB_31-40.png",
-		},
-		{
-			//
-			//
-			//36
-			//
-			//a0
-			qType: "Section B: Lexis & Structure",
-			question: "36. The problem is quite complicated; it calls for an <u>in-depth</u> study.",
-			choices: ["A) thorough",
-			          "B) quick",
-			          "C) simple",
-			          "D) brief"],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionB_31-40.png",
-		},
-		{
-			//
-			//
-			//37
-			//
-			//d3
-			qType: "Section B: Lexis & Structure",
-			question: "37. Some people have become the <u>guinea pigs</u> for a new political system.",
-			choices: ["A) supporters",
-				        "B) leaders",
-				        "C) opponents",
-				        "D) test subjects"],
-			correctAnswer: 3,
-			image: "img/JAMB4_Comprehension_SectionB_31-40.png",
-		},
-		{
-			//
-			//
-			//38
-			//
-			//c2
-			qType: "Section B: Lexis & Structure",
-			question: "38. That is the company’s final offer. The decision is yours; <u>take it or leave it</u>.",
-			choices: ["A) negotiate further",
-			          "B) think about it",
-			          "C) accept it or reject it",
-			          "D) delay the decision"],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionB_31-40.png",
-		},
-		{
-			//
-			//
-			//39
-			//
-			//a0
-			qType: "Section B: Lexis & Structure",
-			question: "39. The plan fell through; they had to start <u>from scratch</u>.",
-			choices: ["A) from the beginning",
-					      "B) with new ideas",
-					      "C) from experience",
-					      "D) with great effort"],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionB_31-40.png",
-		},
-		{
-			//
-			//
-			//40
-			//
-			//c2
-			qType: "Section B: Lexis & Structure",
-			question: "40. You are old enough to <u>tell</u> what is right <u>from</u> what is wrong.",
-			choices: ["A) decide / to",
-			          "B) know / for",
-			          "C) distinguish / from",
-			          "D) choose / against"],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionB_31-40.png",
-		},
-		{
-			//
-			//
-			//41
-			//a0
-			//q41-50 opposites start
-			qType: "Section B: Lexis & Structure",
-			question: "41. For an organisation to be successful, it <u>calls for</u> the cooperation of all the staff.",
-			choices: ["A) discourages",
-			          "B) requires",
-			          "C) fails",
-			          "D) expects"],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionB_41-50.png",
-		},
-		{
-			//
-			//
-			//42
-			//d3
-			//
-			qType: "Section B: Lexis & Structure",
-			question: "42. It took three years for Tom to <u>pay up</u> his car loan.",
-			choices: ["A) borrow",
-					      "B) repay",
-					      "C) delay",
-					      "D) owe"],
-			correctAnswer: 3,
-			image: "img/JAMB4_Comprehension_SectionB_41-50.png",
-		},
-		{
-			//
-			//
-			//43
-			//b1
-			//
-			qType: "Section B: Lexis & Structure",
-			question: "43. Those used to driving recklessly and <u>at breakneck speed</u> are accident-prone, so be cautious.",
-			choices: ["A) carelessly",
-			          "B) slowly",
-			          "C) patiently",
-			          "D) at top speed"],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionB_41-50.png",
-		},
-		{
-			//
-			//
-			//44
-			//c2
-			//
-			qType: "Section B: Lexis & Structure",
-			question: "44. June overspends every month. She is $500 <u>over budget</u> this month.",
-			choices: ["A) within budget",
-				        "B) above budget",
-				        "C) under budget",
-				        "D) on budget"],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionB_41-50.png",
-		},
-		{
-			//
-			//
-			//45
-			//
-			//a0
-			qType: "Section B: Lexis & Structure",
-			question: "45. Harrison looks stout, but he is often <u>susceptible to</u> colds.",
-			choices: ["A) resistant to",
-				        "B) affected by",
-				        "C) insensitive to",
-				        "D) unaware of"],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionB_41-50.png",
-		},
-		{
-			//
-			//
-			//46
-			//
-			//d3
-			qType: "Section B: Lexis & Structure",
-			question: "46. No matter how strict we are, we have to <u>bend the rules</u> under special circumstances.",
-			choices: ["A) ignore the rules",
-					      "B) break the rules",
-					      "C) follow the rules",
-					      "D) enforce the rules"],
-			correctAnswer: 3,
-			image: "img/JAMB4_Comprehension_SectionB_41-50.png",
-		},
-		{
-			//
-			//
-			//47
-			//
-			//a0
-			qType: "Section B: Lexis & Structure",
-			question: "47. This meeting is open to all. Please <u>feel free to</u> express your opinions.",
-			choices: ["A) be hesitant to",
-					      "B) be encouraged to",
-					      "C) be restricted to",
-					      "D) be unwilling to"],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionB_41-50.png",
-		},
-		{
-			//
-			//
-			//48
-			//
-			//b1
-			qType: "Section B: Lexis & Structure",
-			question: "48. It was <u>no joke</u> for an old man to carry such a heavy load.",
-			choices: ["A) difficult",
-					      "B) easy",
-					      "C) humorous",
-					      "D) serious"],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionB_41-50.png",
-		},
-		{
-			//
-			//
-			//49
-			//
-			//c2
-			qType: "Section B: Lexis & Structure",
-			question: "49. If you <u>miss the boat</u> this time, you may have to wait for a long time until the next round.",
-			choices: ["A) avoid the situation",
-					      "B) lose the opportunity",
-					      "C) catch the opportunity",
-					      "D) delay the process"],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionB_41-50.png",
-		},
-		{
-			//
-			//
-			//50
-			//a0
-			//
-			qType: "Section B: Lexis & Structure",
-			question: "50. Can one commit offences and <u>get away with</u> punishment in this country?",
-			choices: ["A) face",
-					      "B) evade",
-					      "C) accept",
-					      "D) endure"],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionB_41-50.png",
-		},
-		{
-			//
-			//
-			//51
-			//
-			//c2
-			qType: "Section C: Oral Forms",
-			question: "51. though",
-			choices: ["A) plough",
-					      "B) cough",
-					      "C) dough",
-					      "D) bought"],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionB_51-52.png",
-		},
-		{
-			//
-			//
-			//52
-			//
-			//a0
-			qType: "Section C: Oral Forms",
-			question: "52. cord",
-			choices: ["A) sword",
-								"B) word",
-								"C) curd",
-								"D) work"],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionB_51-52.png",
-		},
-		{
-			//
-			//
-			//53
-			//
-			//c2
-			qType: "Section C: Oral Forms",
-			question: "53. We stayed in a TOWN surrounded by high mountains.",
-			choices: ["A) Was the town you stayed in surrounded by high buildings?",
-					      "B) Who stayed in a town surrounded by high mountains?",
-					      "C) Did you stay in a hotel surrounded by high mountains?",
-					      "D) Did you stay in a town surrounded by beautiful mountains?"],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionB_53-54.png",
-		},
-		{
-			//
-			//
-			//54
-			//d3
-			//
-			qType: "Section C: Oral Forms",
-			question: "54. Children love unwrapping parcels at CHRISTMAS time.",
-			choices: ["A) How do children wrap parcels at Christmas time?",
-				        "B) Who loves unwrapping parcels at Christmas time?",
-				        "C) Do children love wrapping parcels at Christmas time?",
-				        "D) Do children love unwrapping parcels at Halloween?"],
-			correctAnswer: 3,
-			image: "img/JAMB4_Comprehension_SectionB_53-54.png",
-		},
-		{
-			//
-			//
-			//55
-			//b1
-			//
-			qType: "Section C: Oral Forms",
-			question: "55. He dated his check with a date that was later than the real date.",
-			choices: ["A) He misplaced his check.",
-					      "B) He post-dated his check.",
-					      "C) He over-dated his check.",
-					      "D) He redated his check."],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionB_55-56.png",
-		},
-		{
-			//a0
-			//
-			//56
-			//
-			//
-			qType: "Section C: Oral Forms",
-			question: "56. Don't get angry with him. His heart is in the right place.",
-			choices: ["A) He has good intentions to do good things.",
-				        "B) He does not fit in.",
-				        "C) He concentrates on what is happening.",
-				        "D) He never misses anything."],
-			correctAnswer: 0,
-			image: "img/JAMB4_Comprehension_SectionB_55-56.png",
-		},
-		{
-			//
-			//
-			//57
-			//
-			//c2
-			qType: "Section C: Oral Forms",
-			question: "57. The cost of living has increased while there has been a decrease in wages.",
-			choices: ["A) INcreased; DEcrease",
-					      "B) INcreased; deCREASE",
-					      "C) inCREASED; DEcrease",
-					      "D) inCREASED; deCREASE"],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionC_57-58.png",
-		},
-		{
-			//
-			//
-			//58
-			//b1
-			//
-			qType: "Section C: Oral Forms",
-			question: "58. The earthquake caused a catastrophe in the city, destroying buildings and leaving thousands homeless.",
-			choices: ["A) CAtastrophe",
-				        "B) caTAStrophe",
-				        "C) catasTROphe",
-				        "D) catastroPHE"],
-			correctAnswer: 1,
-			image: "img/JAMB4_Comprehension_SectionC_57-58.png",
-		},
-		{
-			//
-			//
-			//59
-			//
-			//c2
-			qType: "Section C: Oral Forms",
-			question: "59. They sang a psalm to honour the memory of the Queen as she was laid to rest in the family tomb.",
-			choices: ["A) One",
-					      "B) Two",
-					      "C) Three",
-				        "D) Four"],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionC_59-60.png",
-		},
-		{
-			//
-			//
-			//60
-			//
-			//c2
-			qType: "Section C: Oral Forms",
-			question: "60. You could have left me half the cake on Wednesday.",
-			choices: ["A) One",
-				        "B) Two",
-				        "C) Three",
-				        "D) Four"],
-			correctAnswer: 2,
-			image: "img/JAMB4_Comprehension_SectionC_59-60.png",
-		},
+  var questionCounter =
+    parseInt(sessionStorage.getItem("questionCounter")) || 0; //Tracks question number
+  var selections = JSON.parse(sessionStorage.getItem("selections")) || []; //Array containing user choices
+  var quiz = $("#quiz"); //Quiz div object
+  var defaultQuestionContent;
+  defaultQuestionContent = $("#content").text();
+
+  // Function to update session storage
+  const updateSessionStorage = () => {
+    sessionStorage.setItem("questionCounter", JSON.stringify(questionCounter));
+    sessionStorage.setItem("selections", JSON.stringify(selections));
+  };
+
+  // Function to start the timer
+  function startTimer() {
+    if (examEnded) return;
+
+    // Get the last stored timestamp
+    var storedStartTime = parseInt(sessionStorage.getItem("examStartTime"));
+
+    if (!storedStartTime) {
+      // Store the current timestamp if not set
+      storedStartTime = Date.now();
+      sessionStorage.setItem("examStartTime", storedStartTime);
+    }
+
+    var timer = setInterval(function () {
+      if (examEnded) {
+        clearInterval(timer);
+        return;
+      }
+
+      // Calculate the elapsed time since the exam started
+      var elapsedTime = Math.floor((Date.now() - storedStartTime) / 1000); // Convert ms to seconds
+      currentTime = Math.max(totalTime - elapsedTime, 0);
+
+      var hours = Math.floor(currentTime / 3600);
+      var minutes = Math.floor((currentTime % 3600) / 60);
+      var seconds = currentTime % 60;
+
+      // Format and display the timer
+      timerDisplay.text(
+        `${minutes < 10 ? "0" : ""}${minutes}:${
+          seconds < 10 ? "0" : ""
+        }${seconds}`
+      );
+
+      // 15-minute mark
+      if (currentTime === 15 * 60) {
+        swal(
+          "Keep going!",
+          "You are halfway through the exam. Stay focused!",
+          "info"
+        );
+      }
+
+      // 5-minute warning
+      if (currentTime === 5 * 60) {
+        swal(
+          "Almost there!",
+          "You have 5 minutes remaining. Finish strong!",
+          "info"
+        );
+      }
+
+      // 1-minute warning
+      if (currentTime === 1 * 60) {
+        swal(
+          "Final stretch!",
+          "You have 1 minute remaining. Wrap it up!",
+          "warning"
+        );
+      }
+
+      // Time is up
+      if (currentTime <= 0) {
+        clearInterval(timer);
+        examEnded = true;
+        swal("Time's up!", "Your time for this quiz has expired.", "error");
+
+        // Hide the quiz and show the final score
+        $("#quiz").empty();
+        $("#next").hide();
+        $("#prev").hide();
+        $("#start").show();
+
+        var scoreElem = displayScore();
+        $("#quiz").append(scoreElem);
+      }
+    }, 1000);
+  }
+
+  // Ensure timer continues when tab is changed
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) {
+      startTimer(); // Restart the timer when user returns
+    }
+  });
+
+  // Start the timer when the quiz loads
+  $(document).ready(function () {
+    startTimer();
+  });
+
+  // Display initial question
+  displayNext();
+
+  // Click handler for the 'next' button
+  $("#next").on("click", function (e) {
+    e.preventDefault();
+
+    // Suspend click listener during fade animation
+    if (quiz.is(":animated")) {
+      return false;
+    }
+    choose();
+
+    // If no user selection, progress stopped and pop-up alert
+    if (isNaN(selections[questionCounter])) {
+      swal("Please make a selection.", "Choose the best option.", "warning");
+    } else {
+      questionCounter++;
+      updateSessionStorage();
+      displayNext();
+    }
+  });
+
+  // Click handler for the 'prev' button
+  $("#prev").on("click", function (e) {
+    e.preventDefault();
+
+    if (quiz.is(":animated")) {
+      return false;
+    }
+    choose();
+    questionCounter--;
+    updateSessionStorage();
+    displayNext();
+  });
+
+  // Click handler for the 'Start Over' button
+  $("#start").on("click", function (e) {
+    e.preventDefault();
+
+    if (quiz.is(":animated")) {
+      return false;
+    }
+
+    // Reset variables
+    questionCounter = 0;
+    selections = [];
+    examEnded = false; // Allow timer to run again
+    currentTime = totalTime; // Set the exam time (adjust as needed)
+    updateSessionStorage();
+
+    // Display the first question
+    displayNext();
+
+    // Restart the timer
+    startTimer();
+
+    // Hide the start button
+    $("#start").hide();
+  });
+
+  // Animates buttons on hover
+  $(".button").on("mouseenter", function () {
+    $(this).addClass("active");
+  });
+  $(".button").on("mouseleave", function () {
+    $(this).removeClass("active");
+  });
+
+  // Creates and returns the div that contains the questions and
+  // the answer selections
+  function createQuestionElement(index) {
+    var qElement = $("<div>", {
+      id: "question",
+    });
+
+    var header = $("<h2>Question " + (index + 1) + ":</h2>");
+    qElement.append(header);
+
+    var textProblem = $("<p>").append(questions[index].textProblem);
+    qElement.append(textProblem);
+
+    var question = $("<p>").append(questions[index].question);
+    qElement.append(question);
+
+    var radioButtons = createRadios(index);
+    qElement.append(radioButtons);
+
+    return qElement;
+  }
+
+  // Creates a list of the answer choices as radio inputs
+  function createRadios(index) {
+    var radioList = $("<ul>");
+    var item;
+    var input = "";
+    for (var i = 0; i < questions[index].choices.length; i++) {
+      item = $("<li>");
+      input = '<label><input data-focusable type="radio" name="answer" value=' + i + " />";
+      input += questions[index].choices[i];
+      input += "</label>";
+      item.append(input);
+      radioList.append(item);
+    }
+    return radioList;
+  }
+
+  // Reads the user selection and pushes the value to an array
+  function choose() {
+    selections[questionCounter] = +$('input[name="answer"]:checked').val();
+    updateSessionStorage();
+  }
+
+  // Keydown listener for keyboard navigation (A-Z, Enter, Arrow keys disabled)
+  $(document).keydown(function (e) {
+    // Prevent non-alphabet keys (like arrow keys, etc.)
+    if (e.keyCode >= 37 && e.keyCode <= 40) {
+      return; // Do nothing if it's an arrow key
+    }
 
 
+    // Check for the 'Tab' key
+    if (e.key === 'Tab') {
+      e.preventDefault();
+
+      // Create an array of focusable elements
+      const focusableElements = Array.from(document.querySelectorAll("[data-focusable]")).filter((el) => el.offsetParent !== null);
+
+      // Identify the current active element
+      const activeElement = document.activeElement;
+
+      // Find the index of the currently active element in the focusable elements array
+      let currentIndex = focusableElements.indexOf(activeElement);
 
 
+      if (currentIndex === -1 || currentIndex >= focusableElements.length - 1) {
+        currentIndex = -1;
+      }
+
+      if (currentIndex === -1){
+        focusableElements[0].focus();
+        return;
+      }
+
+      let nextIndex;
+
+      if (e.shiftKey) {
+        // If Shift + Tab, move backward in the array
+        nextIndex = (currentIndex - 1 + focusableElements.length) % focusableElements.length;
+      } else {
+        // If Tab, move forward in the array
+        nextIndex = (currentIndex + 1) % focusableElements.length;
+      }
+
+      // Focus on the next element in the sequence
+      focusableElements[nextIndex].focus();
+    }
 
 
+    // Check for the 'Enter' key (keyCode 13)
+    if (e.key === "Enter" || e.keyCode === 13) {
+      // Create an array of focusable elements
+      const focusableElements = Array.from(document.querySelectorAll("[data-focusable]")).filter((el) => el.offsetParent !== null);
+      // Checks if active elements are in focusable elements
+      const activeElement = document.activeElement;
+      if (focusableElements.includes(activeElement)) {
+        activeElement.click();
+        return;
+      }
+
+      if (questionCounter >= questions.length) {
+        $("#start").click(); // Simulate click on the 'Start Over' button
+      } else {
+        // Get all radio inputs for the current question
+        var options = $("input[name='answer']:checked");
+
+        // If a radio button is not selected, show the warning
+        if (options.length === 0) {
+          swal(
+              "Please make a selection.", "Choose the best answer before continuing.", "warning");
+        } else {
+          // Proceed to the next question
+          $("#next").click(); // Simulate click on the 'Next' button
+        }
+      }
+      return;
+    }
+
+    // Handle Spacebar (keyCode 32)
+    if (e.key === "Space"|| e.keyCode === 32) {
+      // If the active element is a SweetAlert button, trigger the click event
+      const activeElement = document.activeElement;
+      if (activeElement && activeElement.classList.contains('swal-button')) {
+        activeElement.click(); // Trigger the 'OK' button click
+        return;
+      }
+    }
+    // Get the key pressed (convert it to uppercase for consistency)
+    var key = e.key.toUpperCase();
+
+    // Only proceed if the key pressed is a letter between 'A' and 'Z'
+    if (key >= "A" && key <= "Z") {
+      // Calculate which option to select based on the key
+      var optionIndex = key.charCodeAt(0) - 65; // 'A' -> 0, 'B' -> 1, etc.
+
+      // Get all radio inputs for the current question
+      var options = $("input[name='answer']");
+
+      // Only select if the index is within the number of options
+      if (optionIndex < options.length) {
+        // Set the radio input as checked
+        options.eq(optionIndex).prop("checked", true);
+
+        // Update the selection for the current question
+        selections[questionCounter] = optionIndex;
+      }
+    }
 
 
+    if (e.key === "Space" || e.keyCode === 32) {
+      // Dismiss the SweetAlert
+      swal.close();
+    }
+
+    if (e.key != "Tab") {
+      const focusedElement = document.activeElement;
+      if (focusedElement && focusedElement.offsetParent !== null) {
+        // Remove focused from the currently focused element
+        focusedElement.blur();
+      }
+    }
+  });
+
+  // Displays next requested element
+  function displayNext() {
+    quiz.fadeOut(function () {
+      $("#question").remove();
+
+      if (questionCounter < questions.length) {
+        var question = questions[questionCounter];
+
+        // Show 'image' defined in question object
+
+        if (typeof question.image !== "undefined") {
+          $("#image img").attr("src", question.image);
+          $("#image").show();
+        } else {
+          $("#image").hide();
+        }
+
+        if (typeof question.audio !== "undefined") {
+          $("#audio").show();
+          $("#audio audio").attr("src", "audio/" + question.audio);
+          //$("#audio audio")[0].play();
+        } else {
+          $("#audio").hide();
+          $("#audio audio").stop();
+        }
+
+        // Show 'content' defined in question object
+        console.log(typeof question.content, defaultQuestionContent);
+        if (typeof question.content === "undefined") {
+          $("#content").text(defaultQuestionContent);
+        } else {
+          $("#content").text(question.content);
+        }
+
+        // Show 'qType' defined in question object
+        console.log(typeof question.qType, defaultQuestionContent);
+        if (typeof question.qType === "undefined") {
+          $("#qType").text(defaultQuestionContent);
+        } else {
+          $("#qType").text(question.qType);
+        }
+
+        var nextQuestion = createQuestionElement(questionCounter);
+        quiz.append(nextQuestion).fadeIn();
+
+        // Update progress bar
+        var progress = (questionCounter / NumberOfQuestion) * 100; // Assuming there are 60 questions
+        if (questionCounter === NumberOfQuestion) {
+          progress = 100; // Force 100% when the last question is reached
+        }
+        console.log(questionCounter);
+        $("#progress-bar").css("width", progress + "%");
+        $("#progress-text").text(
+          Math.floor(progress) + (progress % 1 >= 0.5 ? ".5%" : ".0%")
+        );
+        if (!isNaN(selections[questionCounter])) {
+          $("input[value=" + selections[questionCounter] + "]").prop(
+            "checked",
+            true
+          );
+        }
+
+        // Controls display of 'prev' button
+        if (questionCounter >= 1) {
+          $("#prev").show();
+        } else if (questionCounter === 0) {
+          $("#prev").hide();
+          $("#next").show();
+        }
+      } else {
+        var scoreElem = displayScore();
+        quiz.append(scoreElem).fadeIn();
+        $("#next").hide();
+        $("#prev").hide();
+        $("#start").show();
+      }
+    });
+  }
+
+  // Computes score and returns a paragraph element to be displayed
+  function displayScore() {
+    currentTime = 0; // Ensure timer is set to 0
+    examEnded = true; // Mark the exam as ended
+    questionCounter = NumberOfQuestion; //Sets the exam to the last question
+    sessionStorage.removeItem("examStartTime"); // Removes the stored exam start time from session storage
+    updateSessionStorage();
+
+    // Sets theprogressbar to 100%
+    var progress = 100;
+    $("#progress-bar").css("width", progress + "%");
+    $("#progress-text").text(
+      Math.floor(progress) + (progress % 1 >= 0.5 ? ".5%" : ".0%")
+    );
+
+    // Update the timer display to show 0:00
+    timerDisplay.text("00:00");
+
+    // Call results generation
+    generateResultsPage();
+
+    var score = $("<p>", {
+      id: "question",
+    });
+
+    var numCorrect = 0;
+    for (var i = 0; i < selections.length; i++) {
+      if (selections[i] === questions[i].correctAnswer) {
+        numCorrect++;
+      }
+    }
+
+    score.append(
+      "You got " +
+        numCorrect +
+        " questions out of " +
+        questions.length +
+        " right."
+    );
+
+    return score;
+  }
+  function getScore() {
+
+    let numCorrect = 0;
+
+    for (let i = 0; i < selections.length; i++) {
+
+      if (selections[i] === questions[i].correctAnswer) {
+
+        numCorrect++;
+
+      }
+
+    }
+
+    return numCorrect;
+
+  }
 
 
+  // Computes score and returns a paragraph element to be displayed
+
+  function generateResultsPage() {
+
+    // Calculate score
+
+    const score = getScore();
+    const totalQuestions = questions.length;
 
 
-	];
-	var questionCounter = 0; //Tracks question number
-	var selections = []; //Array containing user choices
-	var quiz = $("#quiz"); //Quiz div object
-	var defaultQuestionContent;
-	defaultQuestionContent = $("#content").text();
+    // Start building HTML content
 
-	// Display initial question
-	displayNext();
+    let html = `
 
-	// Click handler for the 'next' button
-	$("#next").on("click", function (e) {
-		e.preventDefault();
+              <!DOCTYPE html>
+              <html>
+              <head>
 
-		// Suspend click listener during fade animation
-		if (quiz.is(":animated")) {
-			return false;
-		}
-		choose();
+                  <title>JAMB 4 Exam Results</title>
+                  <style>           
+                      body {
 
-		// If no user selection, progress stopped and pop-up alert
-		if (isNaN(selections[questionCounter])) {
-			swal("Please make a selection.", "Choose the best option.", "warning");
-		} else {
-			questionCounter++;
-			displayNext();
-		}
-	});
+                            font-family: Arial, sans-serif;
+                            margin: 0 auto;
+                            padding: 20px;
+                            max-width: 800px; /* Ensures a neat layout on standard screens */
+                            background-color: #f4f7fa;
+                        }                     
 
-	// Click handler for the 'prev' button
-	$("#prev").on("click", function (e) {
-		e.preventDefault();
+                        /* Basic styling for the results page */
+                        .results-page {
 
-		if (quiz.is(":animated")) {
-			return false;
-		}
-		choose();
-		questionCounter--;
-		displayNext();
-	});
+                           font-family: Arial, sans-serif;
+                           margin: 20px;}                             
 
-	// Click handler for the 'Start Over' button
-	$("#start").on("click", function (e) {
-		e.preventDefault();
+                        .score {
 
-		if (quiz.is(":animated")) {
-			return false;
-		}
-		questionCounter = 0;
-		selections = [];
-		displayNext();
-		$("#start").hide();
-	});
+                           font-size: 20px;
+                           margin-bottom: 40px; /* space before the next page */
+                        }
 
-	// Animates buttons on hover
-	$(".button").on("mouseenter", function () {
-		$(this).addClass("active");
-	});
-	$(".button").on("mouseleave", function () {
-		$(this).removeClass("active");
-	});
+                        .score h1 {
 
-	// Creates and returns the div that contains the questions and
-	// the answer selections
-	function createQuestionElement(index) {
-		var qElement = $("<div>", {
-			id: "question",
-		});
+                            font-family: 'Impact', sans-serif; 
+                            font-size: 36px;  /* Adjust the size as needed */
+                            font-weight: bold; /* Optional: Makes the text bold */
+                            color: #333; /* Optional: Set a color for the text */
+                            text-align: center; /* Centers the text */
+                        }
 
-		var header = $("<h2>Question " + (index + 1) + ":</h2>");
-		qElement.append(header);
+                        .question {
 
-		var textProblem = $("<p>").append(questions[index].textProblem);
-		qElement.append(textProblem);
+                            margin-bottom: 30px;
+                            padding: 15px;
+                            background-color: #fff;
+                            border: 1px solid #ddd;
+                            border-radius: 10px;
+                            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+                            display: block;
+                            page-break-inside: avoid; /* Prevent page breaks inside the question */
+                        }
 
-		var question = $("<p>").append(questions[index].question);
-		qElement.append(question);
 
-		var radioButtons = createRadios(index);
-		qElement.append(radioButtons);
+                        .question h3 {
 
-		return qElement;
-	}
+                            font-size: 20px;
+                            color: #333;
+                        }
 
-	// Creates a list of the answer choices as radio inputs
-	function createRadios(index) {
-		var radioList = $("<ul>");
-		var item;
-		var input = "";
-		for (var i = 0; i < questions[index].choices.length; i++) {
-			item = $("<li>");
-			input = '<label><input type="radio" name="answer" value=' + i + " />";
-			input += questions[index].choices[i];
-			input += "</label>";
-			item.append(input);
-			radioList.append(item);
-		}
-		return radioList;
-	}
 
-	// Reads the user selection and pushes the value to an array
-	function choose() {
-		selections[questionCounter] = +$('input[name="answer"]:checked').val();
-	}
+                        .question p {
 
-	// Displays next requested element
-	function displayNext() {
-		quiz.fadeOut(function () {
-			$("#question").remove();
+                            font-size: 16px;
+                            color: #555;
+                            line-height: 1.5;
+                        }
 
-			if (questionCounter < questions.length) {
-				var question = questions[questionCounter];
 
-				// Show 'image' defined in question object
+                        /* General image styling for questions during the test and results page */
 
-				if (typeof question.image !== "undefined") {
-					$("#image img").attr("src", question.image);
-					$("#image").show();
-				} else {
-					$("#image").hide();
-				}
+                        .question-image {
 
-				if (typeof question.audio !== "undefined") {
-					$("#audio").show();
-					$("#audio audio").attr("src", "audio/" + question.audio);
-					//$("#audio audio")[0].play();
-				} else {
-					$("#audio").hide();
-					$("#audio audio").stop();
-				}
+                          width: 100%; /* Adjust to the width of the container */
+                          max-width: 300px; /* Set a max width to prevent overly large images */
+                          height: auto; /* Maintain aspect ratio */
+                          object-fit: cover; /* Ensure the image fills the area without distortion */
+                          margin: 10px 0; /* Optional: Adds spacing around the image */
+                        }
 
-				// Show 'content' defined in question object
-				console.log(typeof question.content, defaultQuestionContent);
-				if (typeof question.content === "undefined") {
-					$("#content").text(defaultQuestionContent);
-				} else {
-					$("#content").text(question.content);
-				}
+                        .choice {
 
-				// Show 'qType' defined in question object
-				console.log(typeof question.qType, defaultQuestionContent);
-				if (typeof question.qType === "undefined") {
-					$("#qType").text(defaultQuestionContent);
-				} else {
-					$("#qType").text(question.qType);
-				}
+                            padding: 10px;
+                            margin: 5px 0;
+                            border-radius: 5px;
+                            background-color: #f8f9fa;
+                            border: 1px solid #ddd;
+                            display: flex;
+                            align-items: center;
+                            font-size: 16px;
+                            color: #333;
+                        }
 
-				var nextQuestion = createQuestionElement(questionCounter);
-				quiz.append(nextQuestion).fadeIn();
-				if (!isNaN(selections[questionCounter])) {
-					$("input[value=" + selections[questionCounter] + "]").prop(
-						"checked",
-						true
-					);
-				}
 
-				// Controls display of 'prev' button
-				if (questionCounter === 1) {
-					$("#prev").show();
-				} else if (questionCounter === 0) {
-					$("#prev").hide();
-					$("#next").show();
-				}
-			} else {
-				var scoreElem = displayScore();
-				quiz.append(scoreElem).fadeIn();
-				$("#next").hide();
-				$("#prev").hide();
-				$("#start").show();
-			}
-		});
-	}
+                        .choice input {
 
-	// Computes score and returns a paragraph element to be displayed
-	function displayScore() {
-		var score = $("<p>", {
-			id: "question",
-		});
+                            margin-right: 10px;
+                            transform: scale(1.2);
+                        }
 
-		var numCorrect = 0;
-		for (var i = 0; i < selections.length; i++) {
-			if (selections[i] === questions[i].correctAnswer) {
-				numCorrect++;
-			}
-		}
 
-		score.append(
-			"You got " +
-				numCorrect +
-				" questions out of " +
-				questions.length +
-				" right."
-		);
-		return score;
-	}
+                        .correct {
+
+                            background-color: #d4edda;
+                            border: 2px solid #28a745;
+                        }
+
+
+                        .incorrect {
+
+                            background-color: #f8d7da;
+                            border: 2px solid #dc3545;
+                        }
+
+
+                        .explanation {
+
+                            background-color: #f8f9fa;
+                            border: 1px solid #e2e6ea;
+                            padding: 10px;
+                            margin-top: 10px;
+                            font-size: 14px;
+                            color: #444;
+                            border-radius: 5px;
+                            page-break-inside: avoid; /* Prevent page break inside the explanation */
+                        }
+
+
+                        .explanation strong {
+
+                            font-weight: bold;
+                        }
+
+                        /* CSS to scale images to a fixed size */
+
+                        .quiz-image {
+
+                          width: 200px; /* You can adjust the width as needed */
+                          height: auto; /* Automatically adjust the height to maintain the aspect ratio */
+                          object-fit: cover; /* Ensure images fit within the box without distortion */
+                          margin: 10px 0; /* Optional: Add some space around the image */
+                        }
+
+                        /* For print */
+
+                        @media print {
+                            body {
+                                max-width: none; /* Make content stretch across the full page */
+                                padding: 10px;
+                            }
+
+
+                            .quiz-image {
+                                width: 100px; /* Set the width smaller for print */
+                                height: auto;
+                                object-fit: cover;
+                            }
+
+
+                            .question-image {
+                                width: 100%; /* Resize for print */
+                                max-width: 200px; /* Smaller size for print */
+                                height: auto; /* Ensure aspect ratio is maintained */
+                                object-fit: cover;
+                                page-break-inside: avoid; /* Prevent page breaks inside the image */
+                              }
+
+
+                            /* Optional: You can also control the layout of other elements for print */
+
+                            .question {
+                                page-break-after: always; /* Ensure each question starts on a new page */
+                              }
+
+                      
+
+                            .choices {
+                                padding-left: 20px;
+                            }
+
+
+                            .choice {
+                                font-size: 14px; /* Smaller font size for printing */
+                                margin: 5px 0;
+                            }
+
+
+                            .explanation {
+                                font-size: 12px; /* Smaller explanation text for print */
+                                margin-top: 15px;
+                            }
+
+
+                            /* Optional: Remove background colors and shadows for printing */
+
+                            .question, .choice, .explanation {
+                                background-color: white;
+                                box-shadow: none;
+                            }
+
+
+                             .score {
+                                page-break-after: always; /* forces a page break after the score page */
+                                font-weight: bold;
+                                color: green;
+                                font-size: 24px;
+                              }
+
+
+                              .score h1 {
+                                font-family: 'Impact', sans-serif; 
+                                font-size: 36px;  /* Adjust the size as needed */
+                                font-weight: bold; /* Optional: Makes the text bold */
+                                color: #333; /* Optional: Set a color for the text */
+                                text-align: center; /* Centers the text */
+                            }
+                        }
+
+                  </style>
+
+              </head>
+
+              <body>
+
+                <div class="results-page">
+                  <div class="score">
+                    <h1>JAMB 4 Test Results</h1>
+                    You scored ${score} out of ${totalQuestions}
+                  </div>
+          `;
+
+
+    // Generate results for each question
+
+    questions.forEach((question, index) => {
+      const userAnswer = selections[index];
+      const isCorrect = userAnswer === question.correctAnswer;
+
+      // Start question div
+      html += `
+                  <div class="question">
+                      <h3>Question ${index + 1}: ${question.qType || "Question"}</h3>
+                      <p>${question.question}</p>
+              `;
+
+      // Add image if exists
+      if (question.image) {
+        html += `<img src="${question.image}" alt="Question Image" class="question-image">`;
+      }
+
+      // Add audio if exists
+      if (question.audio) {
+        html += `
+                      <audio controls>
+                          <source src="audio/${question.audio}" type="audio/mpeg">
+                          Your browser does not support the audio element.
+                      </audio>
+                  `;
+      }
+
+      // Generate choices
+      html += `<div class="choices">`;
+
+      question.choices.forEach((choice, choiceIndex) => {
+        let choiceClass = "";
+        if (choiceIndex === question.correctAnswer) {
+          choiceClass = "correct"; // Always highlight correct answer in green
+        }
+
+        if (choiceIndex === userAnswer) {
+          choiceClass += isCorrect ? " correct" : " incorrect";
+        }
+
+
+        html += `
+                      <div class="choice ${choiceClass}">
+                          ${choice}
+                      </div>
+                  `;
+      });
+
+      html += `</div>`;
+
+      // Add explanation if the answer was incorrect
+      if (question.explanation) {
+        html += `
+                      <div class="explanation">
+                          <strong>Explanation:</strong> ${question.explanation}
+                      </div>
+                  `;
+      }
+
+      html += `</div>`; // Close question div
+    });
+
+
+    // Close HTML
+
+    html += `
+              <div style="text-align: center; margin-top: 20px;">
+                  <button onclick="window.print()">Print Results</button>
+              </div>
+
+              </body>
+              </html>
+          `;
+
+
+    // Open results in a new window
+
+    const resultsWindow = window.open("", "_blank");
+    resultsWindow.document.write(html);
+    resultsWindow.document.close();
+  }
 })();
